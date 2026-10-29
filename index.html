@@ -115,7 +115,7 @@ $('giveup').onclick=()=>giveUp('Gave up');
 $('undo').onclick=()=>{if(done)return;if(path.length>1){path.pop();draw()}else reset()};
 let player=null,submitted=false,db=null,uid=null,rows=[];
 $('go').onclick=()=>{const n=$('pn').value.trim(),d=$('pd').value.trim();if(!n||!d){$('pe').textContent='Please enter both name and department';return}player={name:n.slice(0,60),dept:d.slice(0,60)};$('reg').classList.add('hide')};
-const SB={url:'https://supabase.com/dashboard/project/kcqdsczugiyctpsjnumf/settings/api-keys',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjcWRzY3p1Z2l5Y3Rwc2pudW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNjgyMDAsImV4cCI6MjEwODg0NDIwMH0.6V4zPWl23RKJZkHIzX6vmOc4FtL2TIYG_fDnB8jmYjs'};
+const SB={url:'https://kcqdsczugiyctpsjnumf.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjcWRzY3p1Z2l5Y3Rwc2pudW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNjgyMDAsImV4cCI6MjEwODg0NDIwMH0.6V4zPWl23RKJZkHIzX6vmOc4FtL2TIYG_fDnB8jmYjs'};
 const HD={apikey:SB.key,'Content-Type':'application/json'};if(!SB.key.startsWith('sb_'))HD.Authorization='Bearer '+SB.key;
 try{if(localStorage.getItem('zipDone'))submitted=true}catch(e){}
 async function loadBoard(){try{const r=await fetch(SB.url+'/rest/v1/results?select=name,dept,ms,ok&order=ok.desc,ms.asc&limit=200',{headers:HD});if(r.ok){rows=await r.json();lb()}}catch(e){}}
