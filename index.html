@@ -3,22 +3,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zip</title>
 <style>
-:root{--bg:#fbf8f5;--card:#fff;--ink:#262322;--grid:#e6e0d9;--path:#e8743b;--mut:#8a817a;--btn:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--w:clamp(280px,min(92vw,520px,100vh - 340px),520px);--sw:clamp(280px,min(92vw,480px,100vh - 400px),480px);--bg:#fbf8f5;--card:#fff;--ink:#262322;--grid:#e6e0d9;--path:#e8743b;--mut:#8a817a;--btn:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1a19;--card:#262322;--ink:#f3eee9;--grid:#3a3532;--mut:#a39a92;--btn:#2e2a28}}
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}button{touch-action:manipulation}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;padding:16px}
-.top{width:min(92vw,440px);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
+.top{width:var(--w);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
 .lbl{font-size:11px;letter-spacing:.08em;color:var(--mut);font-weight:700}
 #time{font-family:Georgia,serif;font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .best{text-align:right;font-size:13px;color:var(--mut)}
 .best b{display:block;font-size:20px;color:var(--ink);font-family:Georgia,serif}
-#board{position:relative;width:min(92vw,440px);aspect-ratio:1;background:var(--card);border-radius:14px;box-shadow:0 4px 18px #0002;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden}
+#board{position:relative;width:var(--w);aspect-ratio:1;background:var(--card);border-radius:14px;box-shadow:0 4px 18px #0002;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden}
 #cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr)}
 .c{border:1px solid var(--grid);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(14px,4.4vw,20px)}
 svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .num{position:relative;z-index:2}
 .c.n span{display:flex;align-items:center;justify-content:center;width:70%;aspect-ratio:1;border-radius:50%;background:var(--ink);color:var(--bg);position:relative;z-index:2}
-.row{display:flex;gap:10px;width:min(92vw,440px);margin-top:16px}
+.row{display:flex;gap:10px;width:var(--w);margin-top:16px}
 button{flex:1;padding:14px;border-radius:12px;border:1px solid var(--grid);background:var(--btn);color:var(--ink);font-size:16px;font-weight:600;cursor:pointer}
 #msg{margin-top:14px;color:var(--mut);font-size:14px;text-align:center;min-height:20px}
 #win{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:9}
@@ -28,6 +28,15 @@ button{flex:1;padding:14px;border-radius:12px;border:1px solid var(--grid);backg
 #win p{margin:4px 0;color:var(--mut)}#win .big{font-size:40px;color:var(--ink);font-family:Georgia,serif;font-weight:700}
 #win button{margin-top:16px;width:100%}
 #reg{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10;padding:16px}#reg.hide{display:none}#reg div{width:min(92vw,380px);text-align:center}#reg h1{font-family:Georgia,serif;margin:0 0 6px}#reg p{color:var(--mut);margin:0 0 18px}#reg input{width:100%;padding:14px;margin-bottom:10px;border-radius:12px;border:1px solid var(--grid);background:var(--card);color:var(--ink);font-size:16px}#reg button{width:100%}#pe{color:#c0392b;min-height:20px;font-size:14px}
+#sdk{display:none;position:fixed;inset:0;background:var(--bg);z-index:8;overflow:auto;flex-direction:column;align-items:center;padding:16px}
+#sg{width:var(--sw);aspect-ratio:1;display:grid;grid-template-columns:repeat(9,1fr);border:3px solid #d9a400;touch-action:manipulation;user-select:none}
+.sc{display:flex;align-items:center;justify-content:center;border:1px solid #f2c94c;background:var(--card);font-weight:700;font-size:clamp(16px,5.2vw,24px);color:#2f7de1;cursor:pointer}
+.sc.cr{border-right:3px solid #d9a400}.sc.rb{border-bottom:3px solid #d9a400}
+.sc.g{color:var(--ink);background:var(--btn)}.sc.p{background:#f3e6c4}.sc.s2{background:#d8c8a8}.sc.sel{background:#e0881f;color:#fff}.sc.bad{color:#d11}
+.nt{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:100%;font-size:clamp(7px,2vw,10px);font-weight:600;color:var(--mut);text-align:center;line-height:1.2}
+#pad{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;width:var(--sw);margin-top:14px}
+#pad button{padding:12px 0;font-size:18px}
+.mb.on{background:var(--ink);color:var(--bg)}
 </style></head><body>
 <div class="top">
   <div><div class="lbl">TIME</div><div id="time">0:00.0</div></div>
@@ -38,10 +47,17 @@ button{flex:1;padding:14px;border-radius:12px;border:1px solid var(--grid);backg
 <div class="row"><button id="undo">↶ Undo</button><button id="clear">🗑 Clear</button></div>
 <div class="row" style="margin-top:10px"><button id="giveup">🏳 Give up</button></div>
 <div id="msg">Drag from 1 through the numbers in order. Fill every box.</div>
-<button id="dl" style="display:none;margin-top:10px;width:min(92vw,440px);flex:none">⬇ Download results (CSV)</button>
+<button id="dl" style="display:none;margin-top:10px;width:var(--w);flex:none">⬇ Download results (CSV)</button>
 <div id="reg"><div><h1>Zip Challenge</h1><p>You have 5 minutes. The timer starts when you touch 1. Only your first attempt is recorded.</p><input id="pn" placeholder="Your name" maxlength="60"><input id="pd" placeholder="Department" maxlength="60"><div id="pe"></div><button id="go">Start</button></div></div>
-<div id="bye" style="display:none;position:fixed;inset:0;background:var(--bg);align-items:center;justify-content:center;z-index:20;text-align:center;padding:16px"><div><h1 style="font-family:Georgia,serif;font-size:36px;margin:0 0 8px">Thank you!</h1><p style="color:var(--mut)">Your result has been recorded. You can close this page now.</p></div></div>
-<div id="win"><div><h2 id="wh">Solved!</h2><div class="big" id="wt"></div><p id="wb"></p><p id="wn" style="color:var(--ink);font-weight:600">📸 Take a screenshot for reference</p><div id="lb2" style="width:min(76vw,340px);max-height:38vh;overflow:auto;margin-top:14px;font-size:14px;text-align:left"></div><button id="again">Thank you</button></div></div>
+<div id="sdk"><div class="top"><div><div class="lbl">SUDOKU TIME</div><div id="stime">0:00.0</div></div><div class="best"><span class="lbl">LIMIT</span><b>30:00</b></div></div>
+<div id="sg"></div>
+<div class="row" style="width:var(--sw)"><button class="mb on" id="mN">Normal</button><button class="mb" id="mC">Candidate</button></div>
+<div id="pad"></div>
+<div class="row" style="width:var(--sw)"><button id="sx">✕</button><button id="su">Undo</button></div>
+<div class="row" style="width:var(--sw)"><button id="sgu">🏳 Give up</button></div>
+<div id="msg2" style="margin-top:12px;color:var(--mut);font-size:14px;text-align:center">Timer starts at your first move. On a computer you can also use the keyboard: 1-9, arrow keys, Backspace to erase, N for notes, Ctrl+Z to undo.</div></div>
+<div id="bye" style="display:none;position:fixed;inset:0;background:var(--bg);align-items:center;justify-content:center;z-index:20;text-align:center;padding:16px"><div><h1 style="font-family:Georgia,serif;font-size:36px;margin:0 0 8px">Thank you!</h1><p style="color:var(--mut)">Your results have been recorded. You can close this page now.</p></div></div>
+<div id="win"><div><h2 id="wh">Solved!</h2><div class="big" id="wt"></div><p id="wb"></p><p id="wn" style="color:var(--ink);font-weight:600">📸 Take a screenshot for reference</p><div id="lb2" style="width:min(76vw,340px);max-height:38vh;overflow:auto;margin-top:14px;font-size:14px;text-align:left"></div><button id="again">Next: Sudoku ▶</button></div></div>
 <script>
 const N=8;
 const nums={"1,5":5,"1,1":10,"1,5x":0};
@@ -109,7 +125,7 @@ board.addEventListener('pointerdown',e=>{
 board.addEventListener('pointermove',e=>{if(drag)step(cellAt(e))});
 ['pointerup','pointercancel'].forEach(t=>board.addEventListener(t,()=>drag=false));
 function reset(){path=[];draw();line.setAttribute('points','');clearInterval(tick);t0=null;done=false;$('time').textContent='0:00.0';$('win').classList.remove('show')}
-$('clear').onclick=reset;$('again').onclick=()=>{$('win').classList.remove('show');$('bye').style.display='flex';try{window.close()}catch(e){}};
+$('clear').onclick=reset;$('again').onclick=()=>{$('win').classList.remove('show');if(stage==='zip'){sInit();$('sdk').style.display='flex'}else{$('bye').style.display='flex';try{window.close()}catch(e){}}};
 function giveUp(why){if(done)return;done=true;drag=false;clearInterval(tick);$('time').textContent='5:00.0';$('wh').textContent=why;$('wt').textContent='5:00.0';$('wb').textContent='Time recorded as 5 minutes';$('win').classList.add('show');record(300000,false)}
 $('giveup').onclick=()=>giveUp('Gave up');
 $('undo').onclick=()=>{if(done)return;if(path.length>1){path.pop();draw()}else reset()};
@@ -120,12 +136,56 @@ const HD={apikey:SB.key,'Content-Type':'application/json'};if(!SB.key.startsWith
 try{if(localStorage.getItem('zipDone'))submitted=true}catch(e){}
 async function loadBoard(){try{const r=await fetch(SB.url+'/rest/v1/results?select=name,dept,ms,ok&order=ok.desc,ms.asc&limit=200',{headers:HD});if(r.ok){rows=await r.json();lb()}}catch(e){}}
 async function record(ms,ok){const w=$('wb');
-if(SB.url.startsWith('PASTE')){w.textContent+=' \u00b7 Not saved (database not set up)';return}
+if(SB.url.startsWith('PASTE')||SB.key.startsWith('PASTE')){w.textContent+=' \u00b7 Not saved (database not set up)';return}
 if(submitted){w.textContent+=' \u00b7 Already submitted';await loadBoard();return}
 try{const r=await fetch(SB.url+'/rest/v1/results',{method:'POST',headers:{...HD,Prefer:'return=minimal'},body:JSON.stringify({name:player.name,dept:player.dept,ms:Math.round(ms),ok})});
 if(!r.ok)throw 0;submitted=true;try{localStorage.setItem('zipDone','1')}catch(e){}w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save'}
 await loadBoard()}
-function lb(){const s=[...rows].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms));const l=$('lb2');l.textContent='';if(!s.length)return;const h=document.createElement('div');h.className='lbl';h.textContent='LEADERBOARD';l.appendChild(h);s.forEach((r,i)=>{const d=document.createElement('div');d.style.cssText='display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--grid)'+(player&&r.name===player.name&&r.dept===player.dept?';font-weight:700;color:var(--path)':'');d.textContent=(i+1)+'. '+r.name+' ('+r.dept+')';const t=document.createElement('span');t.textContent=fmt(r.ms)+(r.ok?'':' ✗');d.appendChild(t);l.appendChild(d)})}
+function lb(a){const s=[...(a||rows)].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms));const l=$('lb2');l.textContent='';if(!s.length)return;const h=document.createElement('div');h.className='lbl';h.textContent='LEADERBOARD';l.appendChild(h);s.forEach((r,i)=>{const d=document.createElement('div');d.style.cssText='display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--grid)'+(player&&r.name===player.name&&r.dept===player.dept?';font-weight:700;color:var(--path)':'');d.textContent=(i+1)+'. '+r.name+' ('+r.dept+')';const t=document.createElement('span');t.textContent=fmt(r.ms)+(r.ok?'':' ✗');d.appendChild(t);l.appendChild(d)})}
 function csv(){const q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};return ['Name,Department,Time,Completed'].concat([...rows].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms)).map(r=>[q(r.name),q(r.dept),fmt(r.ms),r.ok?'Yes':'No'].join(','))).join('\n')}
 
+
+const GV=["..1..83.4", "....56...", "..69.45..", "..9.324..", "62...9...", "..5...7..", "5.....9..", "....4...2", ".......7."].join('');const SLIM=1800000;
+let stage='zip',sv=[],sg=[],sn=[],sel=-1,smode='n',shist=[],s0=null,stick=null,sdone=false,sSub=false;
+try{if(localStorage.getItem('sdkDone'))sSub=true}catch(e){}
+const sgEl=$('sg');
+for(let i=0;i<81;i++){const b=document.createElement('div');b.className='sc'+(i%9%3==2&&i%9!=8?' cr':'')+((i/9|0)%3==2&&i<72?' rb':'');b.dataset.i=i;sgEl.appendChild(b)}
+for(let d=1;d<=9;d++){const b=document.createElement('button');b.textContent=d;b.onclick=()=>put(d);$('pad').appendChild(b)}
+function sInit(){sv=[...GV].map(c=>c==='.'?0:+c);sg=sv.map(v=>v>0);sn=new Array(81).fill(0);sel=-1;shist=[];sdone=false;s0=null;clearInterval(stick);$('stime').textContent='0:00.0';render()}
+function bad(i){const v=sv[i];if(!v)return false;const r=i/9|0,c=i%9;for(let j=0;j<81;j++)if(j!==i&&sv[j]===v&&((j/9|0)===r||j%9===c||((j/9|0)/3|0)===(r/3|0)&&((j%9)/3|0)===(c/3|0)))return true;return false}
+function render(){const sr=sel>=0?sel/9|0:-1,sc=sel>=0?sel%9:-1;
+for(let i=0;i<81;i++){const e=sgEl.children[i],r=i/9|0,c=i%9;let k='sc'+(c%3==2&&c!=8?' cr':'')+(r%3==2&&r<8?' rb':'');
+if(sg[i])k+=' g';
+if(sel>=0&&(r===sr||c===sc||((r/3|0)===(sr/3|0)&&(c/3|0)===(sc/3|0))))k+=' p';
+if(sel>=0&&sv[sel]&&sv[i]===sv[sel])k+=' s2';
+if(i===sel)k+=' sel';else if(bad(i))k+=' bad';
+e.className=k;
+if(sv[i]){e.textContent=sv[i]}else if(sn[i]){let h='<div class="nt">';for(let d=1;d<=9;d++)h+='<span>'+((sn[i]>>d)&1?d:'')+'</span>';e.innerHTML=h+'</div>'}else e.textContent=''}}
+sgEl.addEventListener('pointerdown',e=>{const t=e.target.closest('.sc');if(!t||sdone)return;sel=+t.dataset.i;render()});
+function startS(){if(s0||sdone)return;s0=performance.now();stick=setInterval(()=>{const m=performance.now()-s0;if(m>=SLIM){sFinish(false,"Time's up");return}$('stime').textContent=fmt(m)},50)}
+function put(d){if(sdone||sel<0||sg[sel])return;if(smode==='c'&&sv[sel])return;startS();shist.push([sel,sv[sel],sn[sel]]);
+if(smode==='n'){sv[sel]=sv[sel]===d?0:d;sn[sel]=0}else sn[sel]^=1<<d;
+render();if(sv.every(v=>v)&&!sv.some((v,i)=>bad(i)))sFinish(true)}
+$('sx').onclick=()=>{if(sdone||sel<0||sg[sel])return;startS();shist.push([sel,sv[sel],sn[sel]]);sv[sel]=0;sn[sel]=0;render()};
+$('su').onclick=()=>{if(sdone)return;const h=shist.pop();if(h){sv[h[0]]=h[1];sn[h[0]]=h[2];render()}};
+$('mN').onclick=()=>{smode='n';$('mN').classList.add('on');$('mC').classList.remove('on')};
+$('mC').onclick=()=>{smode='c';$('mC').classList.add('on');$('mN').classList.remove('on')};
+$('sgu').onclick=()=>sFinish(false,'Gave up');
+function sFinish(ok,why){if(sdone)return;sdone=true;stage='end';clearInterval(stick);const ms=ok?performance.now()-s0:SLIM;
+$('stime').textContent=fmt(ms);$('wh').textContent=ok?'Sudoku solved!':why;$('wt').textContent=fmt(ms);$('wb').textContent=ok?'':'Time recorded as 30 minutes';
+$('again').textContent='Thank you';$('lb2').textContent='';$('win').classList.add('show');recordS(ms,ok)}
+async function loadS(){try{const r=await fetch(SB.url+'/rest/v1/sudoku_results?select=name,dept,ms,ok&order=ok.desc,ms.asc&limit=200',{headers:HD});if(r.ok)lb(await r.json())}catch(e){}}
+async function recordS(ms,ok){const w=$('wb');
+if(SB.url.startsWith('PASTE')||SB.key.startsWith('PASTE')){w.textContent+=' \u00b7 Not saved (database not set up)';return}
+if(sSub){w.textContent+=' \u00b7 Already submitted';await loadS();return}
+try{const r=await fetch(SB.url+'/rest/v1/sudoku_results',{method:'POST',headers:{...HD,Prefer:'return=minimal'},body:JSON.stringify({name:player.name,dept:player.dept,ms:Math.round(ms),ok})});if(!r.ok)throw 0;sSub=true;try{localStorage.setItem('sdkDone','1')}catch(e){}w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save'}
+await loadS()}
+
+document.addEventListener('keydown',e=>{if($('sdk').style.display!=='flex'||sdone)return;const k=e.key;
+if(e.ctrlKey||e.metaKey){if(k==='z'||k==='Z'){e.preventDefault();$('su').onclick()}return}
+if(k>='1'&&k<='9'){e.preventDefault();put(+k);return}
+if(k==='0'||k==='Backspace'||k==='Delete'){e.preventDefault();$('sx').onclick();return}
+if(k==='n'||k==='N'){(smode==='n'?$('mC'):$('mN')).onclick();return}
+const m={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k];
+if(m){e.preventDefault();let n=sel<0?0:sel+m;if(sel>=0&&((k==='ArrowLeft'&&sel%9===0)||(k==='ArrowRight'&&sel%9===8)))n=sel;if(n>=0&&n<81){sel=n;render()}}});
 </script></body></html>
