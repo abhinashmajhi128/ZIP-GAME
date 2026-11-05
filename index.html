@@ -49,7 +49,7 @@ button{flex:1;padding:14px;border-radius:12px;border:1px solid var(--grid);backg
 <div id="msg">Drag from 1 through the numbers in order. Fill every box.</div>
 <button id="dl" style="display:none;margin-top:10px;width:var(--w);flex:none">⬇ Download results (CSV)</button>
 <div id="reg"><div><h1>Zip Challenge</h1><p>You have 5 minutes. The timer starts when you touch 1. Only your first attempt is recorded.</p><input id="pn" placeholder="Your name" maxlength="60"><input id="pd" placeholder="Department" maxlength="60"><div id="pe"></div><button id="go">Start</button></div></div>
-<div id="sdk"><div class="top"><div><div class="lbl">SUDOKU TIME</div><div id="stime">0:00.0</div></div><div class="best"><span class="lbl">LIMIT</span><b>30:00</b></div></div>
+<div id="sdk"><div class="top"><div><div class="lbl">SUDOKU TIME</div><div id="stime">0:00.0</div></div><div class="best"><span class="lbl">LIMIT</span><b>60:00</b></div></div>
 <div id="sg"></div>
 <div class="row" style="width:var(--sw)"><button class="mb on" id="mN">Normal</button><button class="mb" id="mC">Candidate</button></div>
 <div id="pad"></div>
@@ -142,14 +142,14 @@ if(location.search.includes('reset')){try{localStorage.clear()}catch(e){}}
 async function rpc(fn,body){if(SB.key.startsWith('PASTE'))throw new Error('database key not set up in the file');const r=await fetch(SB.url+'/rest/v1/rpc/'+fn,{method:'POST',headers:HD,body:JSON.stringify(body)});const t=await r.text();if(!r.ok){let m=t;try{m=JSON.parse(t).message||t}catch(e){}throw new Error(m)}try{return JSON.parse(t)}catch(e){return null}}
 async function loadBoard(kind){try{const a=await rpc('get_leaderboard',{});lb(a.filter(r=>r[kind+'_ms']!=null).map(r=>({name:r.name,dept:r.dept,ms:r[kind+'_ms'],ok:r[kind+'_ok']})))}catch(e){}}
 async function record(ms,ok){const w=$('wb');
-if(LS.get('zipDone')){w.textContent+=' \u00b7 Already submitted';await loadBoard('zip');return}
-try{if(!pid)throw new Error('no player');await rpc('save_zip',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('zipDone','1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
+if(LS.get('zipDone_'+pid)){w.textContent+=' \u00b7 Already submitted';await loadBoard('zip');return}
+try{if(!pid)throw new Error('no player');await rpc('save_zip',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('zipDone_'+pid,'1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
 await loadBoard('zip')}
 function lb(a){const s=[...(a||rows)].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms));const l=$('lb2');l.textContent='';if(!s.length)return;const h=document.createElement('div');h.className='lbl';h.textContent='LEADERBOARD';l.appendChild(h);s.forEach((r,i)=>{const d=document.createElement('div');d.style.cssText='display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--grid)'+(player&&r.name===player.name&&r.dept===player.dept?';font-weight:700;color:var(--path)':'');d.textContent=(i+1)+'. '+r.name+' ('+r.dept+')';const t=document.createElement('span');t.textContent=fmt(r.ms)+(r.ok?'':' ✗');d.appendChild(t);l.appendChild(d)})}
 function csv(){const q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};return ['Name,Department,Time,Completed'].concat([...rows].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms)).map(r=>[q(r.name),q(r.dept),fmt(r.ms),r.ok?'Yes':'No'].join(','))).join('\n')}
 
 
-const GV=["..1..83.4", "....56...", "..69.45..", "..9.324..", "62...9...", "..5...7..", "5.....9..", "....4...2", ".......7."].join('');const SLIM=1800000;
+const GV=["..1..83.4", "....56...", "..69.45..", "..9.324..", "62...9...", "..5...7..", "5.....9..", "....4...2", ".......7."].join('');const SLIM=3600000;
 let stage='zip',sv=[],sg=[],sn=[],sel=-1,smode='n',shist=[],s0=null,stick=null,sdone=false,sSub=false;
 try{if(localStorage.getItem('sdkDone'))sSub=true}catch(e){}
 const sgEl=$('sg');
@@ -176,11 +176,11 @@ $('mN').onclick=()=>{smode='n';$('mN').classList.add('on');$('mC').classList.rem
 $('mC').onclick=()=>{smode='c';$('mC').classList.add('on');$('mN').classList.remove('on')};
 $('sgu').onclick=()=>sFinish(false,'Gave up');
 function sFinish(ok,why){if(sdone)return;sdone=true;stage='end';clearInterval(stick);const ms=ok?performance.now()-s0:SLIM;
-$('stime').textContent=fmt(ms);$('wh').textContent=ok?'Sudoku solved!':why;$('wt').textContent=fmt(ms);$('wb').textContent=ok?'':'Time recorded as 30 minutes';
+$('stime').textContent=fmt(ms);$('wh').textContent=ok?'Sudoku solved!':why;$('wt').textContent=fmt(ms);$('wb').textContent=ok?'':'Time recorded as 1 hour';
 $('again').textContent='Thank you';$('lb2').textContent='';$('win').classList.add('show');recordS(ms,ok)}
 async function recordS(ms,ok){const w=$('wb');
-if(LS.get('sdkDone')){w.textContent+=' \u00b7 Already submitted';await loadBoard('sudoku');return}
-try{if(!pid)throw new Error('no player');await rpc('save_sudoku',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('sdkDone','1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
+if(LS.get('sdkDone_'+pid)){w.textContent+=' \u00b7 Already submitted';await loadBoard('sudoku');return}
+try{if(!pid)throw new Error('no player');await rpc('save_sudoku',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('sdkDone_'+pid,'1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
 await loadBoard('sudoku')}
 
 document.addEventListener('keydown',e=>{if($('sdk').style.display!=='flex'||sdone)return;const k=e.key;
@@ -192,5 +192,5 @@ const m={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k];
 if(m){e.preventDefault();let n=sel<0?0:sel+m;if(sel>=0&&((k==='ArrowLeft'&&sel%9===0)||(k==='ArrowRight'&&sel%9===8)))n=sel;if(n>=0&&n<81){sel=n;render()}}});
 
 (function(){try{const p=JSON.parse(LS.get('zipPlayer')||'null');if(!p||!p.id)return;pid=p.id;player={name:p.name,dept:p.dept};$('reg').classList.add('hide');
-if(LS.get('sdkDone')){$('bye').style.display='flex'}else if(LS.get('zipDone')){sInit();$('sdk').style.display='flex'}}catch(e){}})();
+if(LS.get('sdkDone_'+pid)){$('bye').style.display='flex'}else if(LS.get('zipDone_'+pid)){sInit();$('sdk').style.display='flex'}}catch(e){}})();
 </script></body></html>
