@@ -130,17 +130,21 @@ function giveUp(why){if(done)return;done=true;drag=false;clearInterval(tick);$('
 $('giveup').onclick=()=>giveUp('Gave up');
 $('undo').onclick=()=>{if(done)return;if(path.length>1){path.pop();draw()}else reset()};
 let player=null,submitted=false,db=null,uid=null,rows=[];
-$('go').onclick=()=>{const n=$('pn').value.trim(),d=$('pd').value.trim();if(!n||!d){$('pe').textContent='Please enter both name and department';return}player={name:n.slice(0,60),dept:d.slice(0,60)};$('reg').classList.add('hide')};
-const SB={url:'https://kcqdsczugiyctpsjnumf.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtjcWRzY3p1Z2l5Y3Rwc2pudW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNjgyMDAsImV4cCI6MjEwODg0NDIwMH0.6V4zPWl23RKJZkHIzX6vmOc4FtL2TIYG_fDnB8jmYjs'};
+$('go').onclick=async()=>{const n=$('pn').value.trim().slice(0,60),d=$('pd').value.trim().slice(0,60);if(!n||!d){$('pe').textContent='Please enter both name and department';return}
+$('go').disabled=true;$('pe').textContent='Saving\u2026';
+try{pid=await rpc('start_player',{p_name:n,p_dept:d});player={name:n,dept:d};LS.set('zipPlayer',JSON.stringify({id:pid,name:n,dept:d}));$('pe').textContent='';$('reg').classList.add('hide')}
+catch(e){$('pe').textContent='Could not connect: '+e.message;$('go').disabled=false}};
+const SB={url:'https://kcqdsczugiyctpsjnumf.supabase.co',key:'sb_publishable_dSHcaf7IBjjWFsSWDTDQNw_oJWX9lwv'};
 const HD={apikey:SB.key,'Content-Type':'application/json'};if(!SB.key.startsWith('sb_'))HD.Authorization='Bearer '+SB.key;
-try{if(localStorage.getItem('zipDone'))submitted=true}catch(e){}
-async function loadBoard(){try{const r=await fetch(SB.url+'/rest/v1/results?select=name,dept,ms,ok&order=ok.desc,ms.asc&limit=200',{headers:HD});if(r.ok){rows=await r.json();lb()}}catch(e){}}
+let pid=null;
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+if(location.search.includes('reset')){try{localStorage.clear()}catch(e){}}
+async function rpc(fn,body){if(SB.key.startsWith('PASTE'))throw new Error('database key not set up in the file');const r=await fetch(SB.url+'/rest/v1/rpc/'+fn,{method:'POST',headers:HD,body:JSON.stringify(body)});const t=await r.text();if(!r.ok){let m=t;try{m=JSON.parse(t).message||t}catch(e){}throw new Error(m)}try{return JSON.parse(t)}catch(e){return null}}
+async function loadBoard(kind){try{const a=await rpc('get_leaderboard',{});lb(a.filter(r=>r[kind+'_ms']!=null).map(r=>({name:r.name,dept:r.dept,ms:r[kind+'_ms'],ok:r[kind+'_ok']})))}catch(e){}}
 async function record(ms,ok){const w=$('wb');
-if(SB.url.startsWith('PASTE')||SB.key.startsWith('PASTE')){w.textContent+=' \u00b7 Not saved (database not set up)';return}
-if(submitted){w.textContent+=' \u00b7 Already submitted';await loadBoard();return}
-try{const r=await fetch(SB.url+'/rest/v1/results',{method:'POST',headers:{...HD,Prefer:'return=minimal'},body:JSON.stringify({name:player.name,dept:player.dept,ms:Math.round(ms),ok})});
-if(!r.ok)throw 0;submitted=true;try{localStorage.setItem('zipDone','1')}catch(e){}w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save'}
-await loadBoard()}
+if(LS.get('zipDone')){w.textContent+=' \u00b7 Already submitted';await loadBoard('zip');return}
+try{if(!pid)throw new Error('no player');await rpc('save_zip',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('zipDone','1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
+await loadBoard('zip')}
 function lb(a){const s=[...(a||rows)].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms));const l=$('lb2');l.textContent='';if(!s.length)return;const h=document.createElement('div');h.className='lbl';h.textContent='LEADERBOARD';l.appendChild(h);s.forEach((r,i)=>{const d=document.createElement('div');d.style.cssText='display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--grid)'+(player&&r.name===player.name&&r.dept===player.dept?';font-weight:700;color:var(--path)':'');d.textContent=(i+1)+'. '+r.name+' ('+r.dept+')';const t=document.createElement('span');t.textContent=fmt(r.ms)+(r.ok?'':' ✗');d.appendChild(t);l.appendChild(d)})}
 function csv(){const q=v=>{v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'};return ['Name,Department,Time,Completed'].concat([...rows].sort((a,b)=>(b.ok-a.ok)||(a.ms-b.ms)).map(r=>[q(r.name),q(r.dept),fmt(r.ms),r.ok?'Yes':'No'].join(','))).join('\n')}
 
@@ -174,12 +178,10 @@ $('sgu').onclick=()=>sFinish(false,'Gave up');
 function sFinish(ok,why){if(sdone)return;sdone=true;stage='end';clearInterval(stick);const ms=ok?performance.now()-s0:SLIM;
 $('stime').textContent=fmt(ms);$('wh').textContent=ok?'Sudoku solved!':why;$('wt').textContent=fmt(ms);$('wb').textContent=ok?'':'Time recorded as 30 minutes';
 $('again').textContent='Thank you';$('lb2').textContent='';$('win').classList.add('show');recordS(ms,ok)}
-async function loadS(){try{const r=await fetch(SB.url+'/rest/v1/sudoku_results?select=name,dept,ms,ok&order=ok.desc,ms.asc&limit=200',{headers:HD});if(r.ok)lb(await r.json())}catch(e){}}
 async function recordS(ms,ok){const w=$('wb');
-if(SB.url.startsWith('PASTE')||SB.key.startsWith('PASTE')){w.textContent+=' \u00b7 Not saved (database not set up)';return}
-if(sSub){w.textContent+=' \u00b7 Already submitted';await loadS();return}
-try{const r=await fetch(SB.url+'/rest/v1/sudoku_results',{method:'POST',headers:{...HD,Prefer:'return=minimal'},body:JSON.stringify({name:player.name,dept:player.dept,ms:Math.round(ms),ok})});if(!r.ok)throw 0;sSub=true;try{localStorage.setItem('sdkDone','1')}catch(e){}w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save'}
-await loadS()}
+if(LS.get('sdkDone')){w.textContent+=' \u00b7 Already submitted';await loadBoard('sudoku');return}
+try{if(!pid)throw new Error('no player');await rpc('save_sudoku',{p_id:pid,p_ms:Math.round(ms),p_ok:ok});LS.set('sdkDone','1');w.textContent+=' \u00b7 Saved \u2714'}catch(e){w.textContent+=' \u00b7 Could not save ('+e.message+')'}
+await loadBoard('sudoku')}
 
 document.addEventListener('keydown',e=>{if($('sdk').style.display!=='flex'||sdone)return;const k=e.key;
 if(e.ctrlKey||e.metaKey){if(k==='z'||k==='Z'){e.preventDefault();$('su').onclick()}return}
@@ -188,4 +190,7 @@ if(k==='0'||k==='Backspace'||k==='Delete'){e.preventDefault();$('sx').onclick();
 if(k==='n'||k==='N'){(smode==='n'?$('mC'):$('mN')).onclick();return}
 const m={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k];
 if(m){e.preventDefault();let n=sel<0?0:sel+m;if(sel>=0&&((k==='ArrowLeft'&&sel%9===0)||(k==='ArrowRight'&&sel%9===8)))n=sel;if(n>=0&&n<81){sel=n;render()}}});
+
+(function(){try{const p=JSON.parse(LS.get('zipPlayer')||'null');if(!p||!p.id)return;pid=p.id;player={name:p.name,dept:p.dept};$('reg').classList.add('hide');
+if(LS.get('sdkDone')){$('bye').style.display='flex'}else if(LS.get('zipDone')){sInit();$('sdk').style.display='flex'}}catch(e){}})();
 </script></body></html>
